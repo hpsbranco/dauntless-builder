@@ -1,4 +1,9 @@
-# dauntless-builder
+# dauntless-builder (v1)
+
+**OUTDATED**: This is an old version of the website, you can reach it via: https://v1.dauntless-builder.com
+. Dauntless changed dramatically with patch OB 0.7.1, which made this version redundant.
+
+---
 
 Create and share Dauntless builds with your friends!
 
