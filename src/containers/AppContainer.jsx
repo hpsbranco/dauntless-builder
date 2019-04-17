@@ -85,9 +85,9 @@ export default class AppContainer extends React.Component {
                         <div className="notification is-warning">
                             <i className="fas fa-exclamation-triangle"></i> This is an outdated version of Dauntless Builder.
                             {/* eslint-disable-next-line react/no-unescaped-entities */}
-                            You may've been sent here by an old link, the game has changed dramatically since then and everything
-                            you see here is not up to date anymore. To find a new version of this website please head to
-                            <a href="https://www.dauntless-builder.com/">dauntless-builder.com</a>.
+                            <br/>You may've been sent here by an old link, the game has changed dramatically since then and everything
+                            you see here is not up to date anymore.<br/>
+                            To find a new version of this website please head to <a href="https://www.dauntless-builder.com/">dauntless-builder.com</a>.
                         </div>
 
                         <div className="card">
