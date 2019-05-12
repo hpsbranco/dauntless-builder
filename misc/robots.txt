@@ -1,3 +1,2 @@
-User-Agent: *
-Disallow: /favorites
-Disallow: /privacy
+User-agent: * 
+Disallow: /
