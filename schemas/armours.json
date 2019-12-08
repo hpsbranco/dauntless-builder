@@ -119,8 +119,7 @@
                     }
                 },
                 "required": [
-                    "name",
-                    "description"
+                    "name"
                 ],
                 "additionalProperties": false
             },
