@@ -6,9 +6,8 @@
     "license": "MIT",
     "private": true,
     "scripts": {
-        "build": "yarn build-data && yarn build-language && yarn build-frontend",
+        "build": "yarn build-data && yarn build-frontend",
         "build-data": "node ./scripts/builder.js",
-        "build-language": "node ./scripts/translation.js",
         "build-frontend": "webpack --mode=production",
         "build-dev": "webpack --mode=development",
         "deploy": "yarn build && ./scripts/deploy.sh",

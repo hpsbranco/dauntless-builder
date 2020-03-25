@@ -9,10 +9,6 @@ import ReactTooltip from "react-tooltip";
 
 import Helmet from "react-helmet";
 
-import { injectIntl } from "react-intl";
-
-import Case from "case";
-
 import BuildModel from "../models/BuildModel";
 import DataUtility from "../utility/DataUtility";
 
@@ -31,6 +27,7 @@ import DarkModeToggle from "../components/DarkModeToggle";
 import WeaponPartSelectModal from "../components/WeaponPartSelectModal";
 import WeaponPart from "../components/WeaponPart";
 import BondSelectModal from "../components/BondSelectModal";
+import { injectIntl } from "react-intl";
 
 const DAUNTLESS_BUILD_COLLECTION_BASEURL = "https://www.dauntless-build-collection.com/#/maintenance/create?hash=";
 
@@ -63,10 +60,7 @@ class BuildRoute extends React.Component {
         }
 
         this.loadBuild(buildData);
-        // this.dummyData();
     }
-
-    tr(id, ...args) {return this.props.intl.formatMessage({id}, ...args);}
 
     loadBuild(buildData) {
         const itemData = DataUtility.data();
@@ -87,6 +81,10 @@ class BuildRoute extends React.Component {
         this.setState({
             buildData
         });
+    }
+
+    tr(id, ...args) {
+        return this.props.intl.formatMessage({id}, ...args);
     }
 
     dummyData() {
@@ -152,7 +150,7 @@ class BuildRoute extends React.Component {
 
         console.log("Selected: ", itemType, itemName, level, data);
 
-        if(itemType === "weapon") {
+        if(itemType === "Weapon") {
             const item = BuildModel.findWeapon(itemName);
             const itemType = item ? item.type : null;
 
@@ -174,9 +172,9 @@ class BuildRoute extends React.Component {
 
             // switching to a non modular repeater clears all parts
             if (this.state.build.weapon &&
-                this.state.build.weapon.type === "repeater" &&
-                itemType === "repeater" &&
-                item.name !== "repeater"
+                this.state.build.weapon.type === "Repeater" &&
+                itemType === "Repeater" &&
+                item.name !== "Repeater"
             ) {
                 changes.weapon_part1_name = "";
                 changes.weapon_part2_name = "";
@@ -205,7 +203,7 @@ class BuildRoute extends React.Component {
                     }
                 });
             }
-        } else if(itemType === "armour") {
+        } else if(itemType === "Armour") {
             const item = BuildModel.findArmour(itemName);
             let type = data.__armourType.toLowerCase();
 
@@ -221,7 +219,7 @@ class BuildRoute extends React.Component {
                     this.state.build[changesKey] : "";
             }
 
-        } else if(itemType === "lantern") {
+        } else if(itemType === "Lantern") {
             const item = BuildModel.findLantern(itemName);
 
             changes.lantern_name = itemName;
@@ -232,8 +230,8 @@ class BuildRoute extends React.Component {
                 changes.lantern_cell = cells["lantern_cell"] && cells["lantern_cell"].slot === item.cells ?
                     this.state.build["lantern_cell"] : "";
             }
-        } else if(itemType === "cell") {
-            if(data.__parentType === "weapon") {
+        } else if(itemType === "Cell") {
+            if(data.__parentType === "Weapon") {
                 changes["weapon_cell" + data.__slotPosition] = itemName;
             } else {
                 changes[data.__parentType.toLowerCase() + "_cell"] = itemName;
@@ -280,7 +278,6 @@ class BuildRoute extends React.Component {
 
     applyItemSelection(changes) {
         let build = this.state.build;
-        console.log(changes, build);
 
         for(let key in changes) {
             build[key] = changes[key];
@@ -299,7 +296,7 @@ class BuildRoute extends React.Component {
             FavoriteBuildsModel.delete(buildData);
         } else {
             // TODO replace prompt with popper
-            FavoriteBuildsModel.add(buildData, prompt(this.tr("buildName")));
+            FavoriteBuildsModel.add(buildData, prompt(this.tr("ui.buildName")));
         }
 
         this.setState({});
@@ -365,7 +362,8 @@ class BuildRoute extends React.Component {
             parent={this}
             onItemClicked={this.onItemClicked.bind(this)}
             onCellClicked={this.onCellClicked.bind(this)}
-            title={this.tr("builder.weapon")} defaultType="weapon"
+            title={this.tr("builder.weapon")}
+            defaultType="Weapon"
             item={weapon}
             level={this.state.build.weapon_level}
             cells={[
@@ -381,8 +379,6 @@ class BuildRoute extends React.Component {
             return;
         }
 
-        const weaponType = Case.camel(weapon.type).toLowerCase();
-
         const weaponHasParts = partName =>
             ItemUtility.formatWeaponTypeForParts(weapon.type) in this.state.itemData.parts &&
             partName in this.state.itemData.parts[ItemUtility.formatWeaponTypeForParts(weapon.type)];
@@ -395,15 +391,9 @@ class BuildRoute extends React.Component {
             const part = BuildModel.findPart(weapon.type, "specials", this.state.build[slot]);
 
             parts.push(
-                <WeaponPart
-                    key={weapon.type + "_special"}
-                    part={part}
-                    partType="specials"
-                    weaponType={weaponType}
-                    title={this.tr("builder.special")}
-                    onClicked={
-                        () => this.openWeaponPartSelectModal(weapon.type, "specials", slot)
-                    } />
+                <WeaponPart key={weapon.type + "_special"} part={part} title={this.tr("builder.special")} partType="specials" onClicked={
+                    () => this.openWeaponPartSelectModal(weapon.type, "specials", slot)
+                } />
             );
         }
 
@@ -417,15 +407,9 @@ class BuildRoute extends React.Component {
             const part = BuildModel.findPart(weapon.type, "mods", this.state.build[slot]);
 
             parts.push(
-                <WeaponPart
-                    key={weapon.type + "_mod"}
-                    part={part}
-                    partType="mods"
-                    weaponType={weaponType}
-                    title={this.tr("builder.mod")}
-                    onClicked={
-                        () => this.openWeaponPartSelectModal(weapon.type, "mods", slot)
-                    } />
+                <WeaponPart key={weapon.type + "_mod"} part={part} title={this.tr("builder.mod")} partType="mods" onClicked={
+                    () => this.openWeaponPartSelectModal(weapon.type, "mods", slot)
+                } />
             );
         }
 
@@ -445,7 +429,7 @@ class BuildRoute extends React.Component {
         return <Item
             parent={this}
             onItemClicked={openBondItemModal}
-            title={this.tr("builder.bondWeapon")} defaultType="weapon"
+            title={this.tr("builder.bondWeapon")} defaultType="Weapon"
             item={BuildModel.findWeapon(this.state.build.bond_weapon_name)}
             level={this.state.build.weapon_level}
             titlePrefix="Bond"
@@ -454,35 +438,22 @@ class BuildRoute extends React.Component {
     }
 
     getMetaTitle() {
-        const tr = this.tr.bind(this);
-
         if(this.state.build.weapon_name) {
-            return tr(ItemUtility.itemTr(
-                {type: "weapon", name: this.state.build.weapon_name},
-                "name")
-            ) + " Build - Dauntless Builder";
+            return this.state.build.weapon_name + " Build - Dauntless Builder";
         }
 
         return "Dauntless Builder";
     }
 
     getMetaDescription() {
-        const tr = this.tr.bind(this);
-
         const model = BuildModel.tryDeserialize(this.state.buildData);
 
         let armourPieces = Object.values(model.armour)
             .filter(piece => piece !== null)
-            .map(piece => tr(ItemUtility.itemTr(
-                {type: "armour", name: piece.name},
-                "name")
-            ));
+            .map(piece => piece.name);
 
         if(model.lantern) {
-            armourPieces.push(tr(ItemUtility.itemTr(
-                {type: "lantern", name: model.lantern.name},
-                "name")
-            ));
+            armourPieces.push(model.lantern.name);
         }
 
         let metaPerks = [];
@@ -512,7 +483,6 @@ class BuildRoute extends React.Component {
     getMetaImage() {
         if(this.state.build.weapon_name) {
             const weapon = BuildModel.findWeapon(this.state.build.weapon_name);
-
 
             if(weapon.icon) {
                 return `https://www.dauntless-builder.com${weapon.icon}`;
@@ -596,7 +566,8 @@ class BuildRoute extends React.Component {
                         parent={this}
                         onItemClicked={this.onItemClicked.bind(this)}
                         onCellClicked={this.onCellClicked.bind(this)}
-                        title={tr("builder.headArmour")} defaultType="head"
+                        title={this.tr("builder.headArmour")}
+                        defaultType="Head"
                         item={BuildModel.findArmour(this.state.build.head_name)}
                         level={this.state.build.head_level}
                         cells={[
@@ -607,7 +578,8 @@ class BuildRoute extends React.Component {
                         parent={this}
                         onItemClicked={this.onItemClicked.bind(this)}
                         onCellClicked={this.onCellClicked.bind(this)}
-                        title={tr("builder.torsoArmour")} defaultType="torso"
+                        title={this.tr("builder.torsoArmour")}
+                        defaultType="Torso"
                         item={BuildModel.findArmour(this.state.build.torso_name)}
                         level={this.state.build.torso_level}
                         cells={[
@@ -618,7 +590,8 @@ class BuildRoute extends React.Component {
                         parent={this}
                         onItemClicked={this.onItemClicked.bind(this)}
                         onCellClicked={this.onCellClicked.bind(this)}
-                        title={tr("builder.armsArmour")} defaultType="arms"
+                        title={this.tr("builder.armsArmour")}
+                        defaultType="Arms"
                         item={BuildModel.findArmour(this.state.build.arms_name)}
                         level={this.state.build.arms_level}
                         cells={[
@@ -629,7 +602,8 @@ class BuildRoute extends React.Component {
                         parent={this}
                         onItemClicked={this.onItemClicked.bind(this)}
                         onCellClicked={this.onCellClicked.bind(this)}
-                        title={tr("builder.legsArmour")} defaultType="legs"
+                        title={this.tr("builder.legsArmour")}
+                        defaultType="Legs"
                         item={BuildModel.findArmour(this.state.build.legs_name)}
                         level={this.state.build.legs_level}
                         cells={[
@@ -640,7 +614,8 @@ class BuildRoute extends React.Component {
                         parent={this}
                         onItemClicked={this.onItemClicked.bind(this)}
                         onCellClicked={this.onCellClicked.bind(this)}
-                        title={tr("builder.lantern")} defaultType="lantern"
+                        title={this.tr("builder.lantern")}
+                        defaultType="Lantern"
                         item={BuildModel.findLantern(this.state.build.lantern_name)}
                         cells={[
                             [this.state.build.lantern_cell, BuildModel.findCellByVariantName(this.state.build.lantern_cell)]

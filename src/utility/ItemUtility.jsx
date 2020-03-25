@@ -31,42 +31,28 @@ export default class ItemUtility {
     }
 
     static isRepeater(item) {
-        return item.type === "repeater";
+        return item.type === "Repeater";
     }
 
     static itemType(type) {
         switch(type) {
-            case "weapon":
-            case "sword":
-            case "chainBlades":
-            case "axe":
-            case "hammer":
-            case "warPike":
-            case "repeater":
-            case "aetherStrikers":
-                return "weapon";
-            case "armour":
-            case "head":
-            case "torso":
-            case "arms":
-            case "legs":
-                return "armour";
+            case "Weapon":
+            case "Sword":
+            case "Chain Blades":
+            case "Axe":
+            case "Hammer":
+            case "War Pike":
+            case "Repeater":
+            case "Aether Strikers":
+                return "Weapon";
+            case "Head":
+            case "Torso":
+            case "Arms":
+            case "Legs":
+                return "Armour";
         }
 
-        return "lantern";
-    }
-
-    static itemTr(item, ...ext) {
-        const args = [
-            `${ItemUtility.itemType(item.type)}s`,
-            item.name,
-            ...ext
-        ];
-        return ItemUtility.getTr(...args);
-    }
-
-    static getTr(...ext) {
-        return `game.${ext.join(".")}`;
+        return "Lantern";
     }
 
     static formatWeaponTypeForParts(weaponType) {
@@ -75,5 +61,39 @@ export default class ItemUtility {
         }
 
         return weaponType.toLowerCase().replace(" ", "");
+    }
+
+    static tr(collection, itemName) {
+        const data = DataUtility.data();
+
+        if(!itemName || !(collection in data)) {
+            return null;
+        }
+
+        const langData = DataUtility.langGameData();
+
+        if (!(itemName in langData[collection])) {
+            return data[collection][itemName];
+        }
+
+        return ItemUtility.mergeTranslation(data[collection][itemName], langData[collection][itemName]);
+    }
+
+    static mergeTranslation(item, langItem) {
+        if ("name" in langItem) {
+            item.name = langItem["name"];
+        }
+
+        if ("description" in langItem) {
+            item.description = langItem.description;
+        }
+
+        // TODO: handle unique_effects and lanternAbilities
+
+        return item;
+    }
+
+    static trWeapon(itemName) {
+        return ItemUtility.tr("weapons", itemName);
     }
 }

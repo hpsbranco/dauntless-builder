@@ -1,12 +1,8 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { FormattedMessage, injectIntl } from "react-intl";
 import PropTypeUtility from "../utility/PropTypeUtility";
-import ItemUtility from "../utility/ItemUtility";
 
-class ModalCellListItem extends React.Component {
-
-    tr(id, ...args) {return this.props.intl.formatMessage({id}, ...args);}
+export default class ModalCellListItem extends React.Component {
 
     filterRarity(variant) {
         const {item, rarityFilter} = this.props;
@@ -24,7 +20,7 @@ class ModalCellListItem extends React.Component {
 
         let getPerkDescription = perk => {
             if(perk in this.props.itemData.perks) {
-                return this.tr(ItemUtility.getTr("perks", perk, "description"));
+                return this.props.itemData.perks[perk].description;
             }
 
             return null;
@@ -35,19 +31,17 @@ class ModalCellListItem extends React.Component {
         };
 
         let variants = Object.keys(item.variants).filter(this.filterRarity.bind(this)).map(v =>
-            <div key={v} className={"cell " + item.variants[v].rarity} onClick={() => this.props.onSelected("cell", v)}>
+            <div key={v} className={"cell " + item.variants[v].rarity} onClick={() => this.props.onSelected("Cell", v)}>
                 <img src={"/assets/icons/perks/" + item.slot + ".png"} />
                 <div className="cell-perk-wrapper">
-                    <div className="cell-title"><FormattedMessage id={ItemUtility.getTr("cells", v)} /></div>
+                    <div className="cell-title">{v}</div>
                     <div className="perks">{getDescriptions(item.variants[v])}</div>
                 </div>
             </div>
         );
 
         return <React.Fragment key={item.name}>
-            <h3 className={"subtitle cell-title-line " + (this.props.rarityFilter ? "hidden" : "")}>
-                <FormattedMessage id={ItemUtility.getTr("cells", item.name)} />
-            </h3>
+            <h3 className={"subtitle cell-title-line " + (this.props.rarityFilter ? "hidden" : "")}>{item.name}</h3>
             <div className="cells">
                 {variants}
             </div>
@@ -61,10 +55,5 @@ ModalCellListItem.propTypes = {
     rarityFilter: PropTypes.shape({
         value: PropTypes.string
     }),
-    onSelected: PropTypes.func,
-    intl: PropTypes.shape({
-        formatMessage: PropTypes.func.isRequired
-    }).isRequired
+    onSelected: PropTypes.func
 };
-
-export default injectIntl(ModalCellListItem);

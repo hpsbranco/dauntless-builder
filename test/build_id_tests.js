@@ -1,6 +1,5 @@
 const assert = require("assert");
 const Hashids = require("hashids");
-const Case = require("case");
 
 const hashids = new Hashids("spicy");
 
@@ -23,9 +22,8 @@ function makeBuild(buildId) {
     };
 
     const findWeapon = name => {
-        const _name = Case.camel(name);
-        if (_name in itemData.weapons) {
-            return itemData.weapons[_name];
+        if(name in itemData.weapons) {
+            return itemData.weapons[name];
         }
 
         return null;
@@ -46,9 +44,7 @@ function makeBuild(buildId) {
 
     const weaponName = getString("Weapons", idcounter++);
     const weapon = findWeapon(weaponName);
-    const partsType = weapon
-        ? `Parts:${formatWeaponTypeForParts(weapon.type)}`
-        : null;
+    const partsType = weapon ? `Parts:${formatWeaponTypeForParts(weapon.type)}` : null;
 
     let data = {
         __version: version,
@@ -82,17 +78,21 @@ function makeBuild(buildId) {
 }
 
 function assertValid(data) {
-    for (let [buildId, assertions] of data) {
+    for(let [buildId, assertions] of data) {
         let build = makeBuild(buildId);
 
-        for (let assertion of assertions) {
-            assert.equal(build[assertion.field], assertion.value);
+        for(let assertion of assertions) {
+            assert.equal(
+                build[assertion.field],
+                assertion.value
+            );
         }
     }
 }
 
 function assertUpgradeFrom2To3Works(v2str, v3str) {
     let numbers = hashids.decode(v2str);
+
     let data = {
         __version: 3,
         weapon_name: numbers[1],
@@ -121,54 +121,46 @@ function assertUpgradeFrom2To3Works(v2str, v3str) {
         lantern_cell: numbers[30]
     };
 
-    assert.equal(v3str, hashids.encode(Object.values(data)));
+    assert.equal(
+        v3str,
+        hashids.encode(Object.values(data))
+    );
 }
+
 
 describe("Dauntless Builder - Build IDs", () => {
     it("should be able to deserialize builds", () => {
         // a random build that someone send me :)
         assertValid([
-            [
-                "5OUrCoCRnSBUVcztOTjToTeTaCWC12cOFoCBFYUOCqpFxtjCP2fAt01",
-                [
-                    { field: "weapon_name", value: "Brutality of Boreus" },
-                    { field: "weapon_level", value: 15 },
-                    { field: "weapon_part1_name", value: "Mighty Landbreaker" },
-                    { field: "weapon_part2_name", value: "Impulse Crown" },
-                    { field: "weapon_cell0", value: "+3 Deconstruction Cell" },
-                    {
-                        field: "weapon_cell1",
-                        value: "+3 Assassin's Vigour Cell"
-                    },
-                    { field: "torso_name", value: "Boreal Resolve" },
-                    { field: "torso_level", value: 15 },
-                    { field: "torso_cell", value: "+3 Iceborne Cell" },
-                    { field: "arms_name", value: "Boreal Might" },
-                    { field: "arms_level", value: 15 },
-                    { field: "arms_cell", value: "+3 Aetherhunter Cell" },
-                    { field: "legs_name", value: "Boreal March" },
-                    { field: "legs_level", value: 15 },
-                    { field: "legs_cell", value: "+3 Predator Cell" },
-                    { field: "head_name", value: "Boreal Epiphany" },
-                    { field: "head_level", value: 15 },
-                    {
-                        field: "head_cell",
-                        value: "+3 Aetheric Attunement Cell"
-                    },
-                    { field: "lantern_name", value: "Embermane's Rapture" },
-                    {
-                        field: "lantern_cell",
-                        value: "+3 Aetheric Attunement Cell"
-                    }
-                ]
-            ]
+            ["5OUrCoCRnSBUVcztOTjToTeTaCWC12cOFoCBFYUOCqpFxtjCP2fAt01", [
+                {field: "weapon_name", value: "Brutality of Boreus"},
+                {field: "weapon_level", value: 15},
+                {field: "weapon_part1_name", value: "Mighty Landbreaker"},
+                {field: "weapon_part2_name", value: "Impulse Crown"},
+                {field: "weapon_cell0", value: "+3 Deconstruction Cell"},
+                {field: "weapon_cell1", value: "+3 Assassin's Vigour Cell"},
+                {field: "torso_name", value: "Boreal Resolve"},
+                {field: "torso_level", value: 15},
+                {field: "torso_cell", value: "+3 Iceborne Cell"},
+                {field: "arms_name", value: "Boreal Might"},
+                {field: "arms_level", value: 15},
+                {field: "arms_cell", value: "+3 Aetherhunter Cell"},
+                {field: "legs_name", value: "Boreal March"},
+                {field: "legs_level", value: 15},
+                {field: "legs_cell", value: "+3 Predator Cell"},
+                {field: "head_name", value: "Boreal Epiphany"},
+                {field: "head_level", value: 15},
+                {field: "head_cell", value: "+3 Aetheric Attunement Cell"},
+                {field: "lantern_name", value: "Embermane's Rapture"},
+                {field: "lantern_cell", value: "+3 Aetheric Attunement Cell"}
+            ]]
             // TODO: add more items / build variations etc
-        ]);
+        ])
     });
     it("should be able to upgrade build version 2 to 3", () => {
         assertUpgradeFrom2To3Works(
             "4WtbC3CQaSNU6cNTYtxT4TQT4T7TgTBTQTJTkCnCyRI4FjCzFWUyCorFqt0CN3tvtpd",
             "5OUrCoCRnSBUVcztOTjToTeTaCWC12cOFoCBFYUOCqpFxtjCP2fAt01"
-        );
-    });
+        )
+    })
 });

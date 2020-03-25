@@ -1,16 +1,11 @@
 import React from "react";
 import PropTypes from "prop-types";
-import ItemUtility from "../utility/ItemUtility";
 
 import ReactTooltip from "react-tooltip";
-import Case from "case";
 
 import BuildModel from "../models/BuildModel";
-import { injectIntl, FormattedMessage } from "react-intl";
 
-class PerkList extends React.Component {
-    tr(id, ...args) {return this.props.intl.formatMessage({id}, ...args);}
-
+export default class PerkList extends React.Component {
     getPerkLevelClass(perkValue) {
         if(perkValue >= 1 && perkValue < 6) {
             return "perk-ok perk-level-" + perkValue;
@@ -32,15 +27,14 @@ class PerkList extends React.Component {
 
         let effectCount = Array.isArray(perk.key) ? perk.key.length : 1;
 
-        const effectLvl = Math.max(0, Math.min(6, perkValue));
-        // let effect = perk.effects[effectLvl];
+        let effect = perk.effects[Math.max(0, Math.min(6, perkValue))];
 
         let elems = [];
 
         for(let i = 0; i < effectCount; i++) {
             elems.push(
                 <div className="perk-effect" key={"perk-effect-" + i}>
-                    {this.tr(ItemUtility.getTr("perks", perkName, "effects", effectLvl, i))}
+                    {Array.isArray(perk.key) ? effect.description[i] : effect.description}
                 </div>
             );
         }
@@ -52,25 +46,17 @@ class PerkList extends React.Component {
 
     renderPerkTooltipData(perkName, perkValue) {
         let perk = BuildModel.findPerkByName(perkName);
-        let effectCount = Array.isArray(perk.key) ? perk.key.length : 1;
 
         let elems = Object.keys(perk.effects).map(effectKey => {
+            let description = Array.isArray(perk.effects[effectKey].description) ?
+                perk.effects[effectKey].description : [perk.effects[effectKey].description];
+
             let counter = 0;
 
             let value = Math.max(0, Math.min(6, perkValue));
 
-            const elems = [];
-
-            for(let i = 0; i < effectCount; i++) {
-                elems.push(
-                    <span key={"desc" + (counter++)}>
-                        {this.tr(ItemUtility.getTr("perks", perkName, "effects", effectKey, i))}
-                    </span>
-                );
-            }
-
             return <div key={effectKey} className={"tp-effect " + (Number(value) === Number(effectKey) ? "active" : "")}>
-                {elems}
+                {description.map(d => <span key={"desc" + (counter++)}>{d}</span>)}
             </div>;
         });
 
@@ -82,9 +68,9 @@ class PerkList extends React.Component {
             <React.Fragment key={perk.name}>
                 <li className={this.getPerkLevelClass(perk.value)} data-tip data-for={"PerkTooltip-" + perk.name}>
                     <img className="perk-icon" src={"/assets/icons/perks/" +
-                        Case.pascal(BuildModel.findPerkByName(perk.name).type) + ".png"} />
+                        BuildModel.findPerkByName(perk.name).type + ".png"} />
                     <div className="perk-data-wrapper">
-                        <div className="perk-title">+{perk.value} <FormattedMessage id={ItemUtility.getTr("perks", perk.name, "name")} /></div>
+                        <div className="perk-title">+{perk.value} {perk.name}</div>
                         {this.renderPerkEffect(perk.name, perk.value)}
                     </div>
                 </li>
@@ -98,14 +84,14 @@ class PerkList extends React.Component {
         if(perks.length === 0) {
             perks.push(
                 <li key="no-perks-found" className="perk-level-5">
-                    <div className="perk-title"><FormattedMessage id="builder.noPerksAvailable" /></div>
+                    <div className="perk-title">No perks available.</div>
                 </li>
             );
         }
 
         return <ul className="perk-list">
             <li className="perk-title-line">
-                <FormattedMessage tagName="h2" id="builder.perks" />
+                <h2>Perks</h2>
             </li>
 
             {perks}
@@ -114,10 +100,5 @@ class PerkList extends React.Component {
 }
 
 PerkList.propTypes = {
-    perks: PropTypes.array,
-    intl: PropTypes.shape({
-        formatMessage: PropTypes.func.isRequired
-    }).isRequired
+    perks: PropTypes.array
 };
-
-export default injectIntl(PerkList);

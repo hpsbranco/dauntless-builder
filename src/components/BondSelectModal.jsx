@@ -1,10 +1,9 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-import { FormattedHTMLMessage, injectIntl } from "react-intl";
-
 import ModalItemListItem from "./ModalItemListItem";
 import BuildModel from "../models/BuildModel";
+import { injectIntl } from "react-intl";
 
 class BondSelectModal extends React.Component {
 
@@ -35,8 +34,6 @@ class BondSelectModal extends React.Component {
         }
     }
 
-    tr(id, ...args) {return this.props.intl.formatMessage({id}, ...args);}
-
     onBondItemSelected(_, itemName) {
         let newState = Object.assign({}, this.defaultState);
         newState.open = false;
@@ -62,10 +59,10 @@ class BondSelectModal extends React.Component {
 
     renderItem(item) {
         return <ModalItemListItem
-            key={"weapon-" + item.name}
+            key={"Weapon-" + item.name}
             item={item}
             level={this.props.level}
-            type={"weapon"}
+            type={"Weapon"}
             hideCells={true}
             itemData={this.props.itemData}
             onSelected={this.onBondItemSelected.bind(this)} />;
@@ -121,7 +118,7 @@ class BondSelectModal extends React.Component {
                                 className="button"
                                 onClick={() =>
                                     this.onBondItemSelected(null, "")}>
-                                <FormattedHTMLMessage id="builder.selectNoItem" values={{title: this.tr("builder.bondWeapon")}} />
+                                Select&nbsp;<strong>No Bond Weapon</strong>.
                             </button>
                             <button className="button" onClick={() => this.onClose()}>Cancel</button>
                         </div>
@@ -141,10 +138,8 @@ BondSelectModal.propTypes = {
     level: PropTypes.number,
     itemData: PropTypes.shape({
         weapons: PropTypes.object
-    }),
-    intl: PropTypes.shape({
-        formatMessage: PropTypes.func.isRequired
-    }).isRequired
+    })
 };
 
 export default injectIntl(BondSelectModal);
+

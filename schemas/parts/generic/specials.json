@@ -12,14 +12,17 @@
     "hidden": {
       "type": "boolean"
     },
-    "part_effects": {
-      "type": "number"
+    "part_effect": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
     }
   },
   "required": [
     "name",
     "icon",
-    "part_effects"
+    "part_effect"
   ],
   "additionalProperties": false
 }

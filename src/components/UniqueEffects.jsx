@@ -3,7 +3,6 @@ import PropTypes from "prop-types";
 import ItemUtility from "../utility/ItemUtility";
 import PropTypeUtility from "../utility/PropTypeUtility";
 import BuildModel from "../models/BuildModel";
-import { FormattedMessage } from "react-intl";
 
 export default class UniqueEffects extends React.Component {
 
@@ -19,12 +18,8 @@ export default class UniqueEffects extends React.Component {
                     <div className="item-wrapper unset-height">
                         <div className="item part-unique-effect no-cells">
                             <div className="item-data">
-                                <strong>
-                                    <FormattedMessage id={ItemUtility.itemTr(this.props.item, "name")} />
-                                    {" "}
-                                    <FormattedMessage id={uniqueEffect.title ? `builder.${uniqueEffect.title}` : "builder.uniqueEffect"} />
-                                </strong><br/>
-                                <FormattedMessage id={ItemUtility.itemTr(this.props.item, `${uniqueEffect.name}`, "description")} />
+                                <strong>{this.props.item.name} {uniqueEffect.title || "Unique Effect"}</strong>: <br/>
+                                {uniqueEffect.description}
                             </div>
                         </div>
                     </div>

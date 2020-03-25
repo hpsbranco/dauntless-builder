@@ -2,14 +2,15 @@ import React from "react";
 import PropTypes from "prop-types";
 import { IntlProvider } from "react-intl";
 import SettingsUtility from "../utility/SettingsUtility";
+import DataUtility from "../utility/DataUtility";
 
-import * as messages from "../../i18n";
+import langs from "../../i18n/langs.json";
 
 const toLanguageString = (language) => language.split(/[-_]/)[0];
 
-export const availableLanguages = () => Object.keys(messages);
+export const availableLanguages = () => langs.map(lang => lang.code);
 
-export const languageDescriptions = () => Object.entries(messages).map(([key, val]) => ({value: key, label: val.name}));
+export const languageDescriptions = () => langs.map(({name, code}) => ({value: code, label: name}));
 
 export function detectLanguage() {
     const languages = [...navigator.languages];
@@ -28,8 +29,10 @@ export class I18NProvider extends React.PureComponent {
         const language = SettingsUtility.getLanguage();
         const { children } = this.props;
 
+        const messages = DataUtility.langSite();
+
         return (
-            <IntlProvider locale={language} messages={messages[language]}>
+            <IntlProvider locale={language} messages={messages}>
                 {children}
             </IntlProvider>
         );

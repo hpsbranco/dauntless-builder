@@ -9,20 +9,17 @@ import BuildModel from "../models/BuildModel";
 import RepeaterPart from "./RepeaterPart";
 import ItemUtility from "../utility/ItemUtility";
 import UniqueEffects from "./UniqueEffects";
-import { FormattedMessage, FormattedHTMLMessage, injectIntl } from "react-intl";
 
-class Repeater extends React.Component {
+export default class Repeater extends React.Component {
     constructor(props, context) {
         super(props, context);
 
         this.state = {};
     }
 
-    tr(id, ...args) {return this.props.intl.formatMessage({id}, ...args);}
-
     getTotalPower() {
         // non modular repeaters get normal level numbers
-        if (this.props.item.name !== "repeater") {
+        if (this.props.item.name !== "Repeater") {
             return this.props.item.power[this.props.level];
         }
 
@@ -51,8 +48,8 @@ class Repeater extends React.Component {
 
     onClicked() {
         let filterOption = {};
-        filterOption.__itemType = "weapon";
-        filterOption.__weaponType = "repeater";
+        filterOption.__itemType = "Weapon";
+        filterOption.__weaponType = "Repeater";
         filterOption.filters = [];
 
         this.props.onItemClicked(filterOption);
@@ -64,7 +61,7 @@ class Repeater extends React.Component {
 
     renderPart(partType, fieldPrefix) {
         // non modular repeaters shouldn't have parts
-        if (this.props.item.name !== "repeater") {
+        if (this.props.item.name !== "Repeater") {
             return null;
         }
 
@@ -85,9 +82,9 @@ class Repeater extends React.Component {
                         <i className="fas fa-question no-item-icon"></i>
                         <div className="item-data">
                             <h3 className="subtitle">
-                                <FormattedHTMLMessage id="builder.noItemSelected" values={{title: this.tr(`builder.${partType.substring(0, partType.length - 1)}`)}} />
+                                No <strong>{partType.capitalize().substring(0, partType.length - 1)}</strong> selected.
                             </h3>
-                            <div><FormattedMessage id="builder.clickToSelect" /></div>
+                            <div>Click here to select one.</div>
                         </div>
                     </div>
                 </div>
@@ -100,25 +97,25 @@ class Repeater extends React.Component {
     }
 
     render() {
-        const name = this.props.item.name === "repeater" ? "repeater" : this.props.item.name;
+        const name = this.props.item.name === "Repeater" ? "Ostian Repeaters" : this.props.item.name;
 
         return <React.Fragment>
             <div className="item-title-wrapper">
-                <h2 className="subtitle hidden-on-large-screens"><FormattedMessage id="builder.weapon" /></h2>
+                <h2 className="subtitle hidden-on-large-screens">Weapon</h2>
                 <div className="item-wrapper">
-                    <div className={"item item-repeater"+ (this.props.item.cells.length === 0 ? " no-cells" : "")} title={this.tr(ItemUtility.itemTr(this.props.item, "description"))} onClick={() => this.onClicked()}>
-                        <ItemIcon item={this.props.item} defaultType={"weapon"} />
+                    <div className={"item item-repeater"+ (this.props.item.cells.length === 0 ? " no-cells" : "")} title={this.props.item.description} onClick={() => this.onClicked()}>
+                        <ItemIcon item={this.props.item} defaultType={"Weapon"} />
                         <div className="item-data">
-                            <h3 className="item-title"><FormattedMessage id={ItemUtility.itemTr(this.props.item, "name")} /> {ItemUtility.levelString(this.props.level)}</h3>
+                            <h3 className="item-title">{name} {ItemUtility.levelString(this.props.level)}</h3>
                             <div className="stat-data">
-                                <FormattedHTMLMessage id="builder.stats.power" tagName="strong" /> {this.getTotalPower()}
+                                <strong>Power</strong>: {this.getTotalPower()}
                             </div>
                         </div>
                     </div>
                     <CellGroup
                         item={this.props.item}
                         cells={this.props.cells}
-                        defaultType={"weapon"}
+                        defaultType={"Weapon"}
                         onCellClicked={this.props.onCellClicked}
                         parent={this.props.parent} />
                 </div>
@@ -140,10 +137,5 @@ Repeater.propTypes = {
     level: PropTypes.number,
     cells: PropTypes.array,
     onItemClicked: PropTypes.func,
-    onCellClicked: PropTypes.func,
-    intl: PropTypes.shape({
-        formatMessage: PropTypes.func.isRequired
-    }).isRequired
+    onCellClicked: PropTypes.func
 };
-
-export default injectIntl(Repeater);

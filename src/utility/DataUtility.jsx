@@ -1,5 +1,8 @@
 // This exists to force a cache update on client. Simply increase the number.
-import Case from "case";
+import flatten from "flat";
+
+import ItemUtility from "./ItemUtility";
+import SettingsUtility from "./SettingsUtility";
 
 const SCRIPT_VERSION = 4;
 
@@ -8,12 +11,14 @@ class DataUtility {
         this._data = null;
         this._meta = null;
         this._map = null;
+        this._langSite = null;
+        this._langGameData = null;
     }
 
     getKeyByValue(object, value) {
-        for (let prop in object) {
-            if (object.hasOwnProperty(prop)) {
-                if (object[prop] === value) {
+        for(let prop in object) {
+            if(object.hasOwnProperty(prop)) {
+                if(object[prop] === value) {
                     return prop;
                 }
             }
@@ -31,26 +36,23 @@ class DataUtility {
     }
 
     getWeaponId(value) {
-        return this.getMapIdByValue("weapons", value);
+        return this.getMapIdByValue("Weapons", value);
     }
 
     getArmourId(value) {
-        return this.getMapIdByValue("armours", value);
+        return this.getMapIdByValue("Armours", value);
     }
 
     getLanternId(value) {
-        return this.getMapIdByValue("lanterns", value);
+        return this.getMapIdByValue("Lanterns", value);
     }
 
     getCellId(value) {
-        return this.getMapIdByValue("cells", value);
+        return this.getMapIdByValue("Cells", value);
     }
 
     getPartId(weaponType, value) {
-        return this.getMapIdByValue(
-            `parts:${Case.camel(weaponType).toLowerCase()}`,
-            value
-        );
+        return this.getMapIdByValue(`Parts:${ItemUtility.formatWeaponTypeForParts(weaponType).capitalize()}`, value);
     }
 
     getJSON(url) {
@@ -60,11 +62,11 @@ class DataUtility {
             request.open("GET", url, true);
 
             request.onload = () => {
-                if (request.status >= 200 && request.status < 400) {
+                if(request.status >= 200 && request.status < 400) {
                     try {
                         const json = JSON.parse(request.responseText);
                         resolve(json);
-                    } catch (ex) {
+                    } catch(ex) {
                         reject(ex);
                     }
                 }
@@ -78,81 +80,85 @@ class DataUtility {
         });
     }
 
-    camelize(data) {
-        if (typeof data === "object") {
-            return Object.keys(data).reduce(
-                (acc, key) =>
-                    Object.assign(acc, {
-                        [key
-                            .split(":")
-                            .map(Case.camel)
-                            .join(":")]: this.camelize(data[key])
-                    }),
-                {}
-            );
-        }
-        return Case.camel(data);
-    }
-
     loadData(urlPrefix = "") {
-        if (this.isCurrentDataStillValid()) {
+        if(this.isCurrentDataStillValid()) {
             this._data = this.retrieveData("__db_data");
             this._meta = this.retrieveData("__db_meta");
             this._map = this.retrieveData("__db_map");
+            this._langGameData = this.retrieveData("__db_lang_data");
+            this._langSite = this.retrieveData("__db_lang_site");
 
             return Promise.resolve(true);
+        }
+
+        const lang = SettingsUtility.getLanguage();
+
+        let langGameData = Promise.resolve({});
+
+        if (lang !== "en") {
+            langGameData = this.getJSON(urlPrefix + `/i18n/data.${lang}.json`);
         }
 
         return Promise.all([
             this.getJSON(urlPrefix + "/data.json"),
             this.getJSON(urlPrefix + "/meta.json"),
-            this.getJSON(urlPrefix + "/map/names.json")
-        ])
-            .then(([data, meta, map]) => {
-                const _map = this.camelize(map);
-                console.log(_map);
+            this.getJSON(urlPrefix + "/map/names.json"),
+            this.getJSON(urlPrefix + `/i18n/site.${lang}.json`),
+            langGameData
+        ]).then(([data, meta, map, langSite, langGameData]) => {
+            langSite = flatten(langSite);
 
-                this.persistData("__db_lastupdate", new Date().getTime());
-                this.persistData("__db_data", data);
-                this.persistData("__db_meta", meta);
-                this.persistData("__db_map", _map);
-                this.persistData("__db_scriptversion", SCRIPT_VERSION);
+            this.persistData("__db_lastupdate", new Date().getTime());
+            this.persistData("__db_data", data);
+            this.persistData("__db_meta", meta);
+            this.persistData("__db_map", map);
+            this.persistData("__db_lang", lang);
+            this.persistData("__db_lang_site", langSite);
+            this.persistData("__db_lang_gamedata", langGameData);
+            this.persistData("__db_scriptversion", SCRIPT_VERSION);
 
-                this._data = data;
-                this._meta = meta;
-                this._map = this.camelize(_map);
+            this._data = data;
+            this._meta = meta;
+            this._map = map;
+            this._langSite = langSite;
+            this._langGameData = langGameData;
 
-                return true;
-            })
-            .catch(reason => {
-                console.error(reason);
-                return false;
-            });
+            return true;
+        }).catch(reason => {
+            console.error(reason);
+            return false;
+        });
     }
 
     isCurrentDataStillValid() {
+        // hasn't been updated yet
         const lastUpdate = this.retrieveData("__db_lastupdate");
 
-        if (
-            !lastUpdate ||
-            ("isDeveloperModeEnabled" in window &&
-                window.isDeveloperModeEnabled())
-        ) {
+        if(!lastUpdate || ("isDeveloperModeEnabled" in window && window.isDeveloperModeEnabled())) {
             return false;
         }
 
+        // script version has changed
         const scriptVersion = this.retrieveData("__db_scriptversion") || -1;
 
-        if (scriptVersion != SCRIPT_VERSION) {
+        if(scriptVersion != SCRIPT_VERSION) {
             return false;
         }
 
+        // language has changed...
+        const lang = SettingsUtility.getLanguage();
+
+        if (lang !== this.retrieveData("__db_lang")) {
+            return false;
+        }
+
+        // data has been timed out
         const now = new Date().getTime();
 
         const SECOND = 1000;
         const MINUTE = 60 * SECOND;
 
-        return now < Number(lastUpdate) + 30 * MINUTE;
+        return now < (Number(lastUpdate) + 30 * MINUTE);
     }
 
     persistData(key, data) {
@@ -173,6 +179,14 @@ class DataUtility {
 
     stringMap() {
         return this._map;
+    }
+
+    langSite() {
+        return this._langSite;
+    }
+
+    langGameData() {
+        return this._langGameData;
     }
 }
 

@@ -2,7 +2,6 @@ import React from "react";
 import ReactDOM from "react-dom";
 
 import AppContainer from "./containers/AppContainer";
-import { I18NProvider } from "./components/I18NProvider";
 
 String.prototype.capitalize = function() {
     return this.charAt(0).toUpperCase() + this.slice(1);
@@ -21,8 +20,6 @@ if (window.location.search && window.location.search.indexOf("?p=/b/") > -1) {
 }
 
 ReactDOM.render(
-    <I18NProvider>
-        <AppContainer />
-    </I18NProvider>,
+    <AppContainer />,
     document.querySelector("#app")
 );
