@@ -185,7 +185,7 @@ export default class BuildModel {
         const numbers = hashids.decode(version3BuildString);
 
         const data = {
-            __version: 3, // keep version number because we want to display an "this is an old build" text
+            __version: 4,
             weapon_name: numbers[1],
             weapon_level: numbers[2],
             weapon_cell0: numbers[3],
