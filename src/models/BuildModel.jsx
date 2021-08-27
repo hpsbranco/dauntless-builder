@@ -219,6 +219,11 @@ export default class BuildModel {
     static convertVersion4To5(version4BuildString) {
         const numbers = hashids.decode(version4BuildString);
 
+        // if this is a v4 build with 24 numbers its actually an already converted build
+        if (numbers.length === 24) {
+            return version4BuildString;
+        }
+
         const data = {
             __version: 4, // keep version number because we want to display an "this is an old build" text
             weapon_name: numbers[1],
