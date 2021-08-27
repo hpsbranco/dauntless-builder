@@ -545,7 +545,6 @@ export default class BuildModel {
     static isValid(str) {
         const data = hashids.decode(str);
         const validBuildLength = Object.keys(BuildModel.empty()).length;
-        console.log(str, data, validBuildLength, Object.keys(BuildModel.empty()), data.length);
         return data.length === validBuildLength;
     }
 }
