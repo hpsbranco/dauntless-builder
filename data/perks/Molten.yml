@@ -1,6 +1,6 @@
 name: Molten
 description: Generates Molten Hearts when dealing damage.
-type: Finesse
+type: Insight
 key: attack_speed
 effects:
   1:
