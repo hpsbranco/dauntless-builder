@@ -292,6 +292,9 @@ export default class BuildRoute extends React.Component {
             build[key] = changes[key];
         }
 
+        // we've changed something, which means we can reset the flags!
+        build.__flags = 0;
+
         // if you're looking at an old build and you change something its a new build!
         if (this.state.build.__version !== CURRENT_BUILD_ID) {
             build.__version = CURRENT_BUILD_ID;
