@@ -1,5 +1,6 @@
 name: Aegis
-description: Grants Health after breaking a Behemoth part.
+description: >-
+  Increases amount of shields received. At later ranks, after gaining 1000 shields, ignore the next incoming hit within 15 seconds.
 type: Fortitude
 key: [IncreaseShieldsReceived, ShieldThresholdIgnoreHit]
 effects:
