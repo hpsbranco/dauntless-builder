@@ -2,6 +2,7 @@ import React from "react";
 import ItemIcon from "./ItemIcon";
 import BuildModel from "../models/BuildModel";
 import PropTypes from "prop-types";
+import {parseText} from "../utility/TextUtility";
 
 const OmnicellSelectModal = ({itemData, onSelected, onCanceled, isOpen}) => {
     if (!isOpen) {
@@ -23,7 +24,7 @@ const OmnicellSelectModal = ({itemData, onSelected, onCanceled, isOpen}) => {
                                     <div className="item-data">
                                         <h3 className="item-title">{item.name}</h3>
                                         <div><strong>Passive</strong>: {item.passive}</div>
-                                        <div><strong>Active</strong>: {item.active}</div>
+                                        <div><strong>Active</strong>: <span dangerouslySetInnerHTML={{__html: parseText(item.active)}} /></div>
                                     </div>
                                 </div>
                             </div>

@@ -3,6 +3,7 @@ import ItemIcon from "./ItemIcon";
 import BuildModel from "../models/BuildModel";
 import LazyLoad from "react-lazy-load";
 import PropTypes from "prop-types";
+import {parseText} from "../utility/TextUtility";
 
 const Omnicell = ({onItemClicked, selected}) => {
     const item = BuildModel.findOmnicell(selected);
@@ -41,7 +42,7 @@ const Omnicell = ({onItemClicked, selected}) => {
                         </LazyLoad>) : null}
                     <div className="item-data">
                         <strong>{item.name + " Active Ability"}</strong>: <br/>
-                        {item.active}
+                        <span dangerouslySetInnerHTML={{__html: parseText(item.active)}} />
                     </div>
                 </div>
             </div>
